@@ -20,9 +20,13 @@ const normalizePort = val => {
   }
   return false;
 };
+// the  normalizePort  function returns a valid port, whether it is provided as a number or a string
 const port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
 
+// the errorHandler function checks for various errors and handles them appropriately — it is then registered to the server
+
+// a "listening" event listener is also registered, logging the port or named pipe on which the server is running to the console
 const errorHandler = error => {
   if (error.syscall !== 'listen') {
     throw error;
