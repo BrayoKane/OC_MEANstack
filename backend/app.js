@@ -1,7 +1,21 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
+const path = require('path');
+
+//  register our new router in our  app.js  file
+const stuffRoutes = require('../backend/routes/stuff');
+const userRoutes = require('../backend/routes/user');
 
 const app = express();
+
+mongoose.connect('mongodb+srv://will:ex6AB1odbncjy0yg@cluster0-8a29a.mongodb.net/test?retryWrites=true&w=majority', {useNewUrlParser:true, useUnifiedTopology:true, useCreateIndex:true})
+    .then(() =>{
+        console.log('Successfully connected to MongoDB Atlas!');
+    })
+    .catch((error) =>{
+        console.log('Unable to connect to MongoDB Atlas!', error);
+    });
 
 // app.use((req, res) => {
 //    res.json({ message: 'Your request was successful!' });
@@ -17,39 +31,12 @@ app.use((req, res, next) => {
 
 app.use(bodyParser.json());
 
-// Make sure you place the POST route above the middleware for GET requests, as the GET logic will currently intercept
-// all requests to your  /api/stuff  endpoint — placing the POST route beforehand
-// will intercept POST requests, preventing them from reaching the GET middleware.
+// We want to register our router for all requests
+app.use('/api/stuff', stuffRoutes);
+app.use('/api/auth', userRoutes);
 
-app.post('/api/stuff', (req, res, next) => {
-    console.log(req.body);
-    //request will time-out if we don't send a request
-    res.status(201).json({
-        message: "Thing created successfully"
-    });
-});
-
-
-app.use('/api/stuff', (req, res, next) => {
-    const stuff = [
-        {
-            _id: 'oeihfzeoi',
-            title: 'My first thing',
-            description: 'All of the info about my first thing',
-            imageUrl: 'https://picsum.photos/id/237/200/300',
-            price: 4900,
-            userId: 'qsomihvqios',
-        },
-        {
-            _id: 'oeihfzeomoihi',
-            title: 'My second thing',
-            description: 'All of the info about my second thing',
-            imageUrl: 'https://picsum.photos/seed/picsum/200/300',
-            price: 2900,
-            userId: 'qsomihvqios',
-        },
-    ];
-    res.status(200).json(stuff);
-});
+//This tells Express to serve up the static resource  images  (a sub-directory of our base directory,  __dirname )
+// whenever it receives a request to the  /images  endpoint
+app.use('/images', express.static(path.join(__dirname, 'images')));
 
 module.exports = app;
